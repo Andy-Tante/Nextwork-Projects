@@ -1,4 +1,4 @@
-#DAY1
+#DAY1 (BUILD A VIRTUAL PRIVATE CLOUD)
 resource "aws_vpc" "vpc" {
   cidr_block = var.cidr_block
   tags = {
@@ -20,7 +20,7 @@ resource "aws_internet_gateway" "igw" {
     Name = "Nextwork IG"
   }
 }
-#DAY 2
+#DAY 2 (VPC TRAFFIC FLOW AND SECURITY)
 resource "aws_instance" "name" {
   ami                         = "ami-02ccbe126fe6afe82"
   instance_type               = "t2.micro"
