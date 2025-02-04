@@ -1,10 +1,12 @@
 #DAY1 (BUILD A VIRTUAL PRIVATE CLOUD)
+#creating a VPC
 resource "aws_vpc" "vpc" {
   cidr_block = var.cidr_block
   tags = {
     Name = "Nextwork VPC"
   }
 }
+#Creating a public subnet
 resource "aws_subnet" "publicsubnet" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = var.publicsubnet
@@ -14,13 +16,16 @@ resource "aws_subnet" "publicsubnet" {
     Name = "Public 1"
   }
 }
+#Creating an Igw
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
   tags = {
     Name = "Nextwork IG"
   }
 }
+
 #DAY 2 (VPC TRAFFIC FLOW AND SECURITY)
+#Creating an instance
 resource "aws_instance" "name" {
   ami                         = "ami-02ccbe126fe6afe82"
   instance_type               = "t2.micro"
@@ -83,7 +88,7 @@ resource "aws_security_group" "name" {
     Name = "Nextwork Security Group"
   }
 }
-#Network Access Control List
+#Creating Network Access Control List
 resource "aws_network_acl" "name" {
   vpc_id = aws_vpc.vpc.id
   #Allow ssh 
