@@ -68,7 +68,7 @@ A security group acts as a virtual firewall to control inbound and outbound traf
 
 Allows all traffic
 
-**4  Network ACL (NACL) for Additional Security**
+**4.  Network ACL (NACL) for Additional Security**
 
 Network ACLs provide an extra layer of security by controlling traffic at the subnet level.
 
