@@ -1,16 +1,78 @@
 # Welcome to Nextwork's Unofficial Repository!
 This is an independent project where I attempt to rebuild some of Nextwork's projects using Terraform as Infrastructure as Code (IaC). This is a learning journey for me, and I hope it proves useful to others as well.
-Day 2: VPC Traffic Flow and Security - Terraform Implementation
 
-Overview
+**Day 2: VPC Traffic Flow and Security - Terraform Implementation**
+
+**Overview**
 
 This project focuses on setting up a secure and scalable AWS Virtual Private Cloud (VPC) environment using Terraform. The implementation includes:
 
-Deploying an EC2 instance in a public subnet
+- Deploying an EC2 instance in a public subnet
 
-Configuring a route table for internet access
+- Configuring a route table for internet access
 
-Creating a security group to control inbound and outbound traffic
+- Creating a security group to control inbound and outbound traffic
 
-Implementing a Network ACL for additional security at the subnet level
+- Implementing a Network ACL for additional security at the subnet level
+
+**Infrastructure Components & Explanation**
+
+**1. EC2 Instance Deployment**
+
+We provision an EC2 instance in a public subnet with an assigned public IP, allowing direct internet access. The key properties include:
+
+- AMI: ami-02ccbe126fe6afe82 (Amazon Linux 2)
+
+- Instance Type: t2.micro (suitable for free-tier and lightweight workloads)
+
+- Security Group: Restricts access to only necessary ports (22, 80, 443)
+
+- Associate Public IP Address: true ensures accessibility from the internet
+
+**2.  Route Table for Internet Access**
+
+A route table is created and associated with the public subnet to allow outbound traffic to the internet through an Internet Gateway (IGW).
+
+**Route Table Association**
+
+This ensures that traffic from our public subnet follows the defined routing rules
+
+**3.  Security Group for EC2 Instance**
+
+A security group acts as a virtual firewall to control inbound and outbound traffic. Here’s what it allows:
+
+**Inbound:**
+
+- Port 80 (HTTP): Open to all for web traffic
+
+- Port 443 (HTTPS): Open to all for secure web traffic
+
+- Port 22 (SSH): Open (ideally should be restricted to specific IPs)
+
+**Outbound:**
+
+Allows all traffic
+
+**Network ACL (NACL) for Additional Security**
+
+Network ACLs provide an extra layer of security by controlling traffic at the subnet level.
+
+**Inbound Rules:**
+
+Allow SSH (22), HTTP (80), HTTPS (443) from all sources
+
+**Outbound Rules:**
+
+Allow all traffic
+
+**Key Learnings**
+
+- Route Tables are essential for directing network traffic in AWS.
+
+- Security Groups control traffic at the instance level and should be restrictive.
+
+- Network ACLs provide subnet-level security but require careful ordering of rules.
+
+- Public IP assignment allows external access but should be used cautiously.
+
 
