@@ -1,6 +1,21 @@
 # Welcome to Nextwork's Unofficial Repository!
 This is an independent project where I attempt to rebuild some of Nextwork's projects using Terraform as Infrastructure as Code (IaC). This is a learning journey for me, and I hope it proves useful to others as well.
 
+**1.  Building a Virtual Private Cloud (VPC)**
+
+**Creating the VPC**
+
+We start by provisioning a Virtual Private Cloud (VPC), which serves as the foundational networking layer for our AWS infrastructure. The VPC has a defined CIDR block that determines its IP range.
+
+**Creating a Public Subnet**
+
+A public subnet is provisioned within the VPC, enabling resources to have direct internet access. This subnet is configured to assign public IPs automatically.
+
+**Attaching an Internet Gateway (IGW)**
+
+An Internet Gateway (IGW) is attached to the VPC to allow communication between the VPC and the internet. This is essential for public-facing resources such as web servers.
+
+------------------------------------------------------------------------------------------------------------------------------
 **Day 2: VPC Traffic Flow and Security - Terraform Implementation**
 
 **Overview**
