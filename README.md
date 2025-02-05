@@ -92,7 +92,9 @@ Allow all traffic
 
 ---------------------------------------------------------------------------------------------------------------------------------
 **Day 3: Creating a Private Subnet**
+
 **Overview**
+
 In a VPC (Virtual Private Cloud), we often separate resources into public and private subnets. A private subnet is used for instances that should not be directly accessible from the internet, such as databases or backend servers.
 
 **Key Features of a Private Subnet:**
