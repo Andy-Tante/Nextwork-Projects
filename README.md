@@ -100,13 +100,17 @@ In a VPC (Virtual Private Cloud), we often separate resources into public and pr
 **Key Features of a Private Subnet:**
 
 ✅ No public IP assigned to instances.
+
 ✅ Cannot directly access or be accessed from the internet.
+
 ✅ Communicates only within the VPC or through a NAT Gateway (if needed).
 
 **In this setup, we’ll:**
 
 Create a private subnet.
+
 Attach a route table that only allows internal VPC communication.
+
 Configure a Network ACL (NACL) to block all traffic for security.
 
 **1. Setting Up a Private Subnet**
@@ -122,7 +126,9 @@ NACLs provide an extra security layer by controlling traffic at the subnet level
 **Summary**
 
 ✅ Created a private subnet with no public IPs.
+
 ✅ Configured a private route table to allow only internal VPC traffic.
+
 ✅ Applied a strict NACL that blocks all traffic, ensuring complete isolation.
 
 This setup is fully secure and can be used for databases, backend applications, or any resource that should not be exposed to the internet.
