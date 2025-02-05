@@ -116,9 +116,11 @@ Configure a Network ACL (NACL) to block all traffic for security.
 **1. Setting Up a Private Subnet**
 
 A private subnet is created within the VPC. Unlike public subnets, instances in this subnet do not get a public IP and cannot directly access the internet.
+
 **2. Private Route Table**
 
 Since this subnet is private, its route table does not allow traffic to the internet. It only allows internal communication within the VPC.
+
 **3. Network ACL (NACL) – Denying All Traffic**
 
 NACLs provide an extra security layer by controlling traffic at the subnet level. Here, we deny all inbound and outbound traffic to make the subnet fully isolated.
