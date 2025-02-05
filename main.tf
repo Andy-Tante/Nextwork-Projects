@@ -44,7 +44,7 @@ resource "aws_route_table" "routnextwork" {
     gateway_id = aws_internet_gateway.igw.id
   }
   tags = {
-    Name = "Nextwork route table"
+    Name = "Nextwork public route table"
   }
 }
 #Creating route table association
@@ -129,5 +129,55 @@ resource "aws_network_acl" "name" {
   }
   tags = {
     Name = "Nextwork Network ACL"
+  }
+}
+
+#Day 3
+resource "aws_subnet" "privatesubnet" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.privatesubnet
+  availability_zone       = var.availability_zone
+  map_public_ip_on_launch = "false"
+  tags = {
+    Name = "Private 1"
+  }
+}
+#Route table
+resource "aws_route_table" "name" {
+  vpc_id = aws_vpc.vpc.id
+  route {
+    gateway_id = "local"
+    cidr_block = "10.0.0.0/16" #VPC internal traffic
+  }
+  tags = {
+    Name = "Nextwork Private Route Table"
+  }
+}
+#Route table association
+resource "aws_route_table_association" "name" {
+  subnet_id      = aws_subnet.privatesubnet.id
+  route_table_id = aws_route_table.name.id
+}
+#NACL
+resource "aws_network_acl" "privatenacl" {
+  vpc_id = aws_vpc.vpc.id
+  ingress {
+    from_port  = 0
+    to_port    = 0
+    protocol   = "-1"
+    action     = "deny"
+    rule_no    = 100
+    cidr_block = "0.0.0.0/0"
+  }
+  egress {
+    from_port  = 0
+    to_port    = 0
+    protocol   = "-1"
+    action     = "deny"
+    rule_no    = 200
+    cidr_block = "0.0.0.0/0"
+  }
+  tags = {
+    Name = "Nextwork Private NACL"
   }
 }

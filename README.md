@@ -90,4 +90,32 @@ Allow all traffic
 
 - Public IP assignment allows external access but should be used cautiously.
 
+---------------------------------------------------------------------------------------------------------------------------------
+**Day 3: Creating a Private Subnet**
+**Overview**
+In a VPC (Virtual Private Cloud), we often separate resources into public and private subnets. A private subnet is used for instances that should not be directly accessible from the internet, such as databases or backend servers.
 
+**Key Features of a Private Subnet:**
+✅ No public IP assigned to instances.
+✅ Cannot directly access or be accessed from the internet.
+✅ Communicates only within the VPC or through a NAT Gateway (if needed).
+
+**In this setup, we’ll:**
+
+Create a private subnet.
+Attach a route table that only allows internal VPC communication.
+Configure a Network ACL (NACL) to block all traffic for security.
+
+**1. Setting Up a Private Subnet**
+A private subnet is created within the VPC. Unlike public subnets, instances in this subnet do not get a public IP and cannot directly access the internet.
+**2. Private Route Table**
+Since this subnet is private, its route table does not allow traffic to the internet. It only allows internal communication within the VPC.
+**3. Network ACL (NACL) – Denying All Traffic**
+NACLs provide an extra security layer by controlling traffic at the subnet level. Here, we deny all inbound and outbound traffic to make the subnet fully isolated.
+
+**Summary**
+✅ Created a private subnet with no public IPs.
+✅ Configured a private route table to allow only internal VPC traffic.
+✅ Applied a strict NACL that blocks all traffic, ensuring complete isolation.
+
+This setup is fully secure and can be used for databases, backend applications, or any resource that should not be exposed to the internet.
