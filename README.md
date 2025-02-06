@@ -134,3 +134,32 @@ NACLs provide an extra security layer by controlling traffic at the subnet level
 ✅ Applied a strict NACL that blocks all traffic, ensuring complete isolation.
 
 This setup is fully secure and can be used for databases, backend applications, or any resource that should not be exposed to the internet.
+
+----------------------------------------------------------------------------
+**# Day 4: Launching a Private Instance**
+
+On Day 4, we focused on deploying an EC2 instance in the private subnet while troubleshooting SSH access issues due to security configurations.
+
+**Key Actions Taken:**
+
+**Created a Private Instance:**
+
+- Launched an EC2 instance inside the private subnet.
+
+- Attached a security group with SSH, HTTP, and HTTPS rules.
+
+- Assigned a key pair for SSH authentication.
+
+- Ensured no public IP was assigned, keeping the instance private.
+
+**Encountered SSH Access Issues:**
+
+- While trying to SSH into the private instance, authentication failed.
+
+- The issue was traced back to NACL rules that were blocking all inbound and outbound traffic.
+
+**Public Instance Verification:**
+
+- Confirmed that the public instance (configured on Day 2) had working SSH access.
+
+- The key pair used in the public subnet allowed successful authentication.

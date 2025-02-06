@@ -32,8 +32,9 @@ resource "aws_instance" "name" {
   subnet_id                   = aws_subnet.publicsubnet.id
   vpc_security_group_ids      = [aws_security_group.name.id]
   associate_public_ip_address = true
+  key_name                    = "terraform-key-pair"
   tags = {
-    Name = "Nextwork Instance"
+    Name = "Nextwork Public Server"
   }
 }
 #Creating route table
@@ -132,7 +133,7 @@ resource "aws_network_acl" "name" {
   }
 }
 
-#Day 3
+#Day 3 (Creating a Private Subnet)
 resource "aws_subnet" "privatesubnet" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = var.privatesubnet
@@ -179,5 +180,17 @@ resource "aws_network_acl" "privatenacl" {
   }
   tags = {
     Name = "Nextwork Private NACL"
+  }
+}
+#DAY 4 Launch private subnet
+resource "aws_instance" "privateinstance" {
+  ami                         = "ami-02ccbe126fe6afe82"
+  instance_type               = "t2.micro"
+  subnet_id                   = aws_subnet.privatesubnet.id
+  vpc_security_group_ids      = [aws_security_group.name.id]
+  associate_public_ip_address = false
+  key_name                    = "terraform-key-pair"
+  tags = {
+    Name = "Nextwork Private Server"
   }
 }
