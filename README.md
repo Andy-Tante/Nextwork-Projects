@@ -15,7 +15,7 @@ A public subnet is provisioned within the VPC, enabling resources to have direct
 
 An Internet Gateway (IGW) is attached to the VPC to allow communication between the VPC and the internet. This is essential for public-facing resources such as web servers.
 
-------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 **Day 2: VPC Traffic Flow and Security - Terraform Implementation**
 
 **Overview**
@@ -163,6 +163,7 @@ On Day 4, we focused on deploying an EC2 instance in the private subnet while tr
 - Confirmed that the public instance (configured on Day 2) had working SSH access.
 
 - The key pair used in the public subnet allowed successful authentication.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 **Day 5: Testing VPC Connectivity 🚀**
 
