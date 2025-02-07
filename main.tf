@@ -64,6 +64,13 @@ resource "aws_security_group" "name" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  #Allows ICMP traffic (Can be Considered as DAY 5)
+  ingress {
+  from_port   = -1
+  to_port     = -1
+  protocol    = "icmp"
+  cidr_blocks = ["0.0.0.0/0"]
+}
   #Allows INCOMING traffic from HTTPS
   ingress {
     from_port   = 443

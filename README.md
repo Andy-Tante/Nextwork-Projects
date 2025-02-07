@@ -163,3 +163,25 @@ On Day 4, we focused on deploying an EC2 instance in the private subnet while tr
 - Confirmed that the public instance (configured on Day 2) had working SSH access.
 
 - The key pair used in the public subnet allowed successful authentication.
+
+**Day 5: Testing VPC Connectivity 🚀**
+
+Today, I tested connectivity between my public and private instances by pinging the private instance from the public one. As expected—it didn't work. But why? 🤔
+
+Could it be due to the NACL rules, which were set to deny all inbound and outbound traffic by default? To test this, I modified the NACL rules to allow all traffic. Did it work? No.
+
+So, what was the problem? After troubleshooting, I realized that ICMP traffic (used for ping) was not allowed in the Security Group. To fix this, I had to add an ingress rule allowing ICMP traffic in the Security Group.
+
+**What is ICMP?**
+
+ICMP (Internet Control Message Protocol) is a network protocol used for diagnostics and error reporting, commonly used in ping and traceroute commands.
+
+Since Security Groups manage instance-level traffic, I added the rule under #Day2 - Allows ICMP traffic (Considered as Day 5) in my Terraform configuration. Finally, as shown below, pinging the private instance was successful! ✅
+
+Next, I tested internet connectivity from the public subnet by running:
+
+curl https://learn.nextwork.org/projects/aws-host-a-website-on-s3
+
+And it worked perfectly! 🎉
+
+This experience reinforced the importance of understanding how Security Groups and NACLs work together in AWS networking.
