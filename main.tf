@@ -1,9 +1,9 @@
 #DAY1 (BUILD A VIRTUAL PRIVATE CLOUD)
-#creating a VPC
+#creating a VPC (vpc 1 is requester)
 resource "aws_vpc" "vpc" {
   cidr_block = var.cidr_block
   tags = {
-    Name = "Nextwork VPC"
+    Name = "Nextwork 1"
   }
 }
 #Creating a public subnet
@@ -155,7 +155,7 @@ resource "aws_route_table" "name" {
   vpc_id = aws_vpc.vpc.id
   route {
     gateway_id = "local"
-    cidr_block = "10.0.0.0/16" #VPC internal traffic
+    cidr_block = "10.1.0.0/16" #VPC internal traffic
   }
   tags = {
     Name = "Nextwork Private Route Table"
@@ -200,4 +200,99 @@ resource "aws_instance" "privateinstance" {
   tags = {
     Name = "Nextwork Private Server"
   }
+}
+#DAY 6 VPC PEERING (VPC2 is accepter)
+resource "aws_vpc" "vpcpeer" {
+  cidr_block = var.vpc2
+  tags = {
+    Name = "NextWork 2"
+  }
+}
+resource "aws_subnet" "peersubnet" {
+  vpc_id = aws_vpc.vpcpeer.id
+  map_public_ip_on_launch = "true"
+  cidr_block = var.peersubnet
+  availability_zone = var.peerAZ
+  tags = {
+    Name = "Public 2"
+  }
+}
+resource "aws_security_group" "peersg" {
+  vpc_id = aws_vpc.vpcpeer.id
+  description = "Accepter security group"
+  ingress {
+    from_port = 22
+    to_port = 22
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol = "tcp"
+  }
+  ingress {
+    from_port = 80
+    to_port = 80
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol = "tcp"
+  }
+  ingress {
+    from_port = 443
+    to_port = 443
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol = "tcp"
+  }
+  ingress {
+    from_port = "-1"
+    to_port = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol = "icmp"
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol = "-1"
+  }
+  tags = {
+    Name = "Security group PEER"
+  }
+}
+resource "aws_instance" "name1" {
+  ami = "ami-02ccbe126fe6afe82"
+  instance_type = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.peersg.id]
+  subnet_id = aws_subnet.peersubnet.id
+  associate_public_ip_address = true
+  tags = {
+    Name = "na"
+  }
+}
+resource "aws_internet_gateway" "peerigw" {
+  vpc_id = aws_vpc.vpcpeer.id
+}
+resource "aws_route_table" "peerroute" {
+  vpc_id = aws_vpc.vpcpeer.id
+  route {
+    gateway_id = aws_internet_gateway.peerigw.id
+    cidr_block = "0.0.0.0/0"
+  }
+}
+resource "aws_route_table_association" "name1" {
+  subnet_id = aws_subnet.peersubnet.id
+  route_table_id = aws_route_table.peerroute.id
+}
+resource "aws_vpc_peering_connection" "peer" {
+  vpc_id = aws_vpc.vpc.id
+  peer_vpc_id = aws_vpc.vpcpeer.id
+  auto_accept = true 
+  tags = {
+    Name = "Nextwork VPC Peering"
+  }
+}
+resource "aws_route" "name" {
+  route_table_id = aws_route_table.name.id
+  destination_cidr_block = var.vpc2
+  vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
+}
+resource "aws_route" "name1" {
+  route_table_id = aws_route_table.peerroute.id
+  destination_cidr_block = var.cidr_block
+  vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
 }
