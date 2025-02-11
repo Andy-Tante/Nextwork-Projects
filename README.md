@@ -287,13 +287,74 @@ Configure a Network ACL (NACL) to block all traffic for security.
 
 A private subnet is created within the VPC. Unlike public subnets, instances in this subnet do not get a public IP and cannot directly access the internet.
 
+```
+#Day 3 (Creating a Private Subnet)
+resource "aws_subnet" "privatesubnet" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.privatesubnet
+  availability_zone       = var.availability_zone
+  map_public_ip_on_launch = "false"
+  tags = {
+    Name = "Private 1"
+  }
+}
+```
+
 **2. Private Route Table**
 
 Since this subnet is private, its route table does not allow traffic to the internet. It only allows internal communication within the VPC.
 
+```
+#Route table
+resource "aws_route_table" "name" {
+  vpc_id = aws_vpc.vpc.id
+  route {
+    gateway_id = "local"
+    cidr_block = "10.1.0.0/16" #VPC internal traffic
+  }
+  tags = {
+    Name = "Nextwork Private Route Table"
+  }
+}
+```
+
+```
+#Route table association
+resource "aws_route_table_association" "name" {
+  subnet_id      = aws_subnet.privatesubnet.id
+  route_table_id = aws_route_table.name.id
+}
+```
+
 **3. Network ACL (NACL) – Denying All Traffic**
 
 NACLs provide an extra security layer by controlling traffic at the subnet level. Here, we deny all inbound and outbound traffic to make the subnet fully isolated.
+
+```
+#NACL
+resource "aws_network_acl" "privatenacl" {
+  vpc_id = aws_vpc.vpc.id
+  ingress {
+    from_port  = 0
+    to_port    = 0
+    protocol   = "-1"
+    action     = "deny"
+    rule_no    = 100
+    cidr_block = "0.0.0.0/0"
+  }
+  egress {
+    from_port  = 0
+    to_port    = 0
+    protocol   = "-1"
+    action     = "deny"
+    rule_no    = 200
+    cidr_block = "0.0.0.0/0"
+  }
+  tags = {
+    Name = "Nextwork Private NACL"
+  }
+}
+```
 
 **Summary**
 
