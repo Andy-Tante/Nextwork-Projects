@@ -28,6 +28,7 @@ resource "aws_subnet" "publicsubnet" {
     Name = "Public 1"
     
   }
+  
 }`
 
 **Attaching an Internet Gateway (IGW)**
