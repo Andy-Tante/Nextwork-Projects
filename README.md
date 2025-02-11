@@ -21,6 +21,7 @@ resource "aws_subnet" "publicsubnet" {
     Name = "Public 1"
   }
 }```
+
 **Attaching an Internet Gateway (IGW)**
 
 An Internet Gateway (IGW) is attached to the VPC to allow communication between the VPC and the internet. This is essential for public-facing resources such as web servers.
