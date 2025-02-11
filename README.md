@@ -11,6 +11,17 @@ We start by provisioning a Virtual Private Cloud (VPC), which serves as the foun
 
 A public subnet is provisioned within the VPC, enabling resources to have direct internet access. This subnet is configured to assign public IPs automatically.
 
+`#Creating a public subnet
+resource "aws_subnet" "publicsubnet" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.publicsubnet
+  map_public_ip_on_launch = "true"
+  availability_zone       = var.availability_zone
+  tags = {
+    Name = "Public 1"
+  }
+}`
+
 **Attaching an Internet Gateway (IGW)**
 
 An Internet Gateway (IGW) is attached to the VPC to allow communication between the VPC and the internet. This is essential for public-facing resources such as web servers.
