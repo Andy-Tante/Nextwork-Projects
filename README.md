@@ -11,9 +11,9 @@ We start by provisioning a Virtual Private Cloud (VPC), which serves as the foun
 
 A public subnet is provisioned within the VPC, enabling resources to have direct internet access. This subnet is configured to assign public IPs automatically.
 
-`#Creating a public subnet
+`#Creating a public subnet`
 
-resource "aws_subnet" "publicsubnet" {
+`resource "aws_subnet" "publicsubnet" {`
 
 vpc_id                  = aws_vpc.vpc.id
 cidr_block              = var.publicsubnet
