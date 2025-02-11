@@ -7,6 +7,16 @@ This is an independent project where I attempt to rebuild some of Nextwork's pro
 
 We start by provisioning a Virtual Private Cloud (VPC), which serves as the foundational networking layer for our AWS infrastructure. The VPC has a defined CIDR block that determines its IP range.
 
+```
+#creating a VPC (vpc 1 is requester)
+resource "aws_vpc" "vpc" {
+  cidr_block = var.cidr_block
+  tags = {
+    Name = "Nextwork 1"
+  }
+}
+```
+
 **Creating a Public Subnet**
 
 A public subnet is provisioned within the VPC, enabling resources to have direct internet access. This subnet is configured to assign public IPs automatically.
@@ -27,6 +37,16 @@ resource "aws_subnet" "publicsubnet" {
 **Attaching an Internet Gateway (IGW)**
 
 An Internet Gateway (IGW) is attached to the VPC to allow communication between the VPC and the internet. This is essential for public-facing resources such as web servers.
+
+```
+#Creating an Igw
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.vpc.id
+  tags = {
+    Name = "Nextwork IG"
+  }
+}
+```
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 **Day 2: VPC Traffic Flow and Security - Terraform Implementation**
