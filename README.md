@@ -13,11 +13,11 @@ A public subnet is provisioned within the VPC, enabling resources to have direct
 
 `#Creating a public subnet
 resource "aws_subnet" "publicsubnet" {
-  vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = var.publicsubnet
-  map_public_ip_on_launch = "true"
-  availability_zone       = var.availability_zone
-  tags = {
+vpc_id                  = aws_vpc.vpc.id
+cidr_block              = var.publicsubnet
+map_public_ip_on_launch = "true"
+availability_zone       = var.availability_zone
+tags = {
     Name = "Public 1"
   }
 }`
