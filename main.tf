@@ -296,3 +296,38 @@ resource "aws_route" "name1" {
   destination_cidr_block = var.cidr_block
   vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
 }
+#Day 7 (VPC Monitoring with flowlogs)
+# Create an IAM Role for VPC Flow Logs
+resource "aws_iam_role" "flow_logs_role" {
+  name = "vpc-flow-logs-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "vpc-flow-logs.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+# Attach IAM Policy to Allow Logging to CloudWatch
+resource "aws_iam_policy_attachment" "flow_logs_policy" {
+  name       = "vpc-flow-logs-attachment"
+  roles      = [aws_iam_role.flow_logs_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+# Create a CloudWatch Log Group for Storing Flow Logs
+resource "aws_cloudwatch_log_group" "flow_logs_group" {
+  name = "/aws/vpc-flow-logs"
+  retention_in_days = 30
+}
+# Enable VPC Flow Logs and Send Logs to CloudWatch
+resource "aws_flow_log" "vpc_flow_logs" {
+  log_destination      = aws_cloudwatch_log_group.flow_logs_group.arn
+  log_destination_type = "cloud-watch-logs"
+  traffic_type         = "ALL" 
+  vpc_id              = aws_vpc.vpc.id
+  iam_role_arn        = aws_iam_role.flow_logs_role.arn
+}
