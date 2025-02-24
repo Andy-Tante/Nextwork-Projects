@@ -2,7 +2,7 @@
 This is an independent project where I attempt to rebuild some of Nextwork's projects using Terraform as Infrastructure as Code (IaC). This is a learning journey for me, and I hope it proves useful to others as well.
 
 # **Day 1: Building a Virtual Private Cloud (VPC)**
-(diagrams/1.png)
+![image](diagrams/1.png)
 **Creating the VPC**
 
 We start by provisioning a Virtual Private Cloud (VPC), which serves as the foundational networking layer for our AWS infrastructure. The VPC has a defined CIDR block that determines its IP range.
