@@ -50,7 +50,7 @@ resource "aws_internet_gateway" "igw" {
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 **Day 2: VPC Traffic Flow and Security**
-
+![image](diagrams/2.png)
 **Overview**
 
 This project focuses on setting up a secure and scalable AWS Virtual Private Cloud (VPC) environment using Terraform. The implementation includes:
@@ -262,7 +262,7 @@ The "-1" indicates it allows traffic from all protocols.
 
 ---------------------------------------------------------------------------------------------------------------------------------
 **Day 3: Creating a Private Subnet**
-
+![image](diagrams/3.png)
 **Overview**
 
 In a VPC (Virtual Private Cloud), we often separate resources into public and private subnets. A private subnet is used for instances that should not be directly accessible from the internet, such as databases or backend servers.
@@ -368,6 +368,7 @@ This setup is fully secure and can be used for databases, backend applications, 
 
 ----------------------------------------------------------------------------
 **# Day 4: Launching a Private Instance**
+![image](diagrams/4.png)
 
 On Day 4, we focused on deploying an EC2 instance in the private subnet while troubleshooting SSH access issues due to security configurations.
 
@@ -411,7 +412,7 @@ resource "aws_instance" "privateinstance" {
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 **Day 5: Testing VPC Connectivity 🚀**
-
+![image](diagrams/5.png)
 Today, I tested connectivity between my public and private instances by pinging the private instance from the public one. As expected—it didn't work. But why? 🤔
 
 Could it be due to the NACL rules, which were set to deny all inbound and outbound traffic by default? To test this, I modified the NACL rules to allow all traffic. Did it work? No.
@@ -443,7 +444,7 @@ This experience reinforced the importance of understanding how Security Groups a
 
 ------------------------------------------------------------------------------------
 **DAY 6: VPC PEERING**
-
+![image](diagrams/6.png)
 This Terraform configuration sets up a VPC peering connection where VPC2 (Accepter) is peered with another VPC (VPC1, REQUESTER). It provisions a subnet, an EC2 instance, a security group, an internet gateway, and necessary route tables for routing traffic between the peered VPCs.
 
 The terraform configuration below is for setting up a second VPC, remember we have a VPC we had created before and that will be our VPC 1.
@@ -548,7 +549,7 @@ resource "aws_route" "name1" {
 ```
 --------------------------------------------------------------------------------
 **DAY 7: VPC Monitoring with Flow Logs**
-
+![image](diagrams/7.png)
 This section configures VPC Flow Logs to monitor traffic within the VPC. Flow Logs capture information about the IP traffic going to and from network interfaces in your VPC.
 
 **Key Components**
@@ -631,7 +632,7 @@ This generates network traffic that will be logged in VPC Flow Logs.
 
 ----------------------------------------------------------------------------
 **DAY 8 and 9: Access S3 from VPC and VPC Endpoints**
-
+![image](diagrams/8.png)
 We will create an S3 bucket, upload images from a specified directory to the bucket, and set up a VPC endpoint to enable secure access to the S3 bucket from within our Virtual Private Cloud (VPC).
 
 ```
@@ -670,6 +671,7 @@ This iterates over each file in the images/ directory, allowing you to upload mu
 A unique identifier for the object, generated from the file's MD5 hash. This ensures that the object will be re-uploaded only if it has changed.
 
 **VPC ENDPOINT**
+![image](diagrams/9.png)
 
 VPC endpoints gives your VPC private, direct access to other AWS services like S3, so traffic doesn't need to go through the internet.
 
