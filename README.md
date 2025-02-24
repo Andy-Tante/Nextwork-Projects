@@ -3,7 +3,7 @@ This is an independent project where I attempt to rebuild some of Nextwork's pro
 
 **#NETWORKING**
 
-[Building a Virtual Private Cloud] (# https://github.com/Andy-Tante/Nextwork-Projects?tab=readme-ov-file#day-1-building-a-virtual-private-cloud-vpc)
+[Building a Virtual Private Cloud] (# **Day 1: Building a Virtual Private Cloud (VPC)**)
 
 # **Day 1: Building a Virtual Private Cloud (VPC)**
 
