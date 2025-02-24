@@ -346,6 +346,7 @@ resource "aws_s3_object" "name" {
   source   = "images/${each.value}"
   etag     = filemd5("images/${each.value}")
 }
+#Day 9
 #vpc endpoints
 resource "aws_vpc_endpoint" "name" {
   vpc_id = aws_vpc.vpc.id
