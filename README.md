@@ -3,9 +3,9 @@ This is an independent project where I attempt to rebuild some of Nextwork's pro
 
 **#NETWORKING**
 
-[Building a Virtual Private Cloud] (#Building a Virtual Private Cloud (VPC))
+[Building a Virtual Private Cloud] (# **Day 1: Building a Virtual Private Cloud (VPC)**)
 
-# **Day 1:  Building a Virtual Private Cloud (VPC)**
+# **Day 1: Building a Virtual Private Cloud (VPC)**
 
 **Creating the VPC**
 
