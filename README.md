@@ -682,5 +682,5 @@ resource "aws_vpc_endpoint" "name" {
   service_name = "com.amazonaws.eu-central-1.s3"
 }
 ```
-![dkd](images.jpeg)
+![images](images.jpeg)
 - SSH into your instance and run: aws s3 ls s3://<bucketname> to see the files inside. For first timers, you'll be prompted to run aws configure to pass in your Access and secret keys before you see your s3 bucket.
