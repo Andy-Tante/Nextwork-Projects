@@ -445,6 +445,7 @@ This experience reinforced the importance of understanding how Security Groups a
 **DAY 6: VPC PEERING**
 
 This Terraform configuration sets up a VPC peering connection where VPC2 (Accepter) is peered with another VPC (VPC1, REQUESTER). It provisions a subnet, an EC2 instance, a security group, an internet gateway, and necessary route tables for routing traffic between the peered VPCs.
+
 The terraform configuration below is for setting up a second VPC, remember we have a VPC we had created before and that will be our VPC 1.
 
 ```
@@ -547,17 +548,22 @@ resource "aws_route" "name1" {
 ```
 --------------------------------------------------------------------------------
 **DAY 7: VPC Monitoring with Flow Logs**
+
 This section configures VPC Flow Logs to monitor traffic within the VPC. Flow Logs capture information about the IP traffic going to and from network interfaces in your VPC.
 
 **Key Components**
 
-**IAM Role for VPC Flow Logs:** Grants permissions to publish logs to CloudWatch.
+- **IAM Role for VPC Flow Logs:** 
+Grants permissions to publish logs to CloudWatch.
 
-**IAM Policy Attachment:** Grants full access to CloudWatch Logs.
+- **IAM Policy Attachment:** 
+Grants full access to CloudWatch Logs.
 
-**CloudWatch Log Group:** Stores the VPC Flow Logs.
+- **CloudWatch Log Group:** 
+Stores the VPC Flow Logs.
 
-**VPC Flow Logs Configuration:** Enables monitoring for all traffic types.
+- **VPC Flow Logs Configuration:** 
+Enables monitoring for all traffic types.
 
 ```
 resource "aws_iam_role" "flow_logs_role" {
@@ -598,11 +604,14 @@ resource "aws_flow_log" "vpc_flow_logs" {
 
 **Generating Logs by Pinging an Instance**
 
-**Launch an EC2 Instance:** Ensure an instance is running inside the monitored VPC. (we have instnaces form the previous porjects you can use)
+- **Launch an EC2 Instance:** 
+Ensure an instance is running inside the monitored VPC. (we have instnaces form the previous porjects you can use)
 
-**Allow ICMP Traffic:** The security group attached to the instance must allow inbound ICMP traffic (ping requests).
+- **Allow ICMP Traffic:** 
+The security group attached to the instance must allow inbound ICMP traffic (ping requests).
 
-**Ping the Instance:** From another instance or your local machine, run:
+- **Ping the Instance:** 
+From another instance or your local machine, run:
 
 ping <EC2_PUBLIC_IP>
 
@@ -620,15 +629,22 @@ This generates network traffic that will be logged in VPC Flow Logs.
 
 - Logs will display information like source IP, destination IP, port, protocol, and whether the traffic was allowed or denied.
 
+----------------------------------------------------------------------------
 **DAY 8 and 9: Access S3 from VPC and VPC Endpoints**
+
 We will create an S3 bucket, upload images from a specified directory to the bucket, and set up a VPC endpoint to enable secure access to the S3 bucket from within our Virtual Private Cloud (VPC).
+
 ```
 resource "aws_s3_bucket" "name" {
   bucket = "dobretechbucket"
 }
 ```
-**resource "aws_s3_bucket" "name":** This block defines an S3 bucket resource.
-**bucket:** The name of the S3 bucket to be created. In this case, it’s named dobretechbucket. Ensure this name is unique across all S3 buckets in AWS.
+
+- **resource "aws_s3_bucket" "name":** 
+This block defines an S3 bucket resource.
+
+- **bucket:** 
+The name of the S3 bucket to be created. In this case, it’s named dobretechbucket. Ensure this name is unique across all S3 buckets in AWS.
 ```
 resource "aws_s3_object" "name" {
   for_each = fileset("images/", "*")
@@ -638,18 +654,28 @@ resource "aws_s3_object" "name" {
   etag     = filemd5("images/${each.value}")
 }
 ```
-**resource "aws_s3_object" "name":** This block defines an S3 object resource.
-**for_each = fileset("images/", "*"):** This iterates over each file in the images/ directory, allowing you to upload multiple images at once.
-**bucket:** Specifies the S3 bucket where the objects will be uploaded.
-**key:** The name of the object in the bucket, which corresponds to the filename.
-**source:** The path to the local file that will be uploaded to the S3 bucket.
-**etag:** A unique identifier for the object, generated from the file's MD5 hash. This ensures that the object will be re-uploaded only if it has changed.
+- **resource "aws_s3_object" "name":** 
+This block defines an S3 object resource.
+
+- **for_each = fileset("images/", "*"):** 
+This iterates over each file in the images/ directory, allowing you to upload multiple images at once.
+
+- **bucket:** Specifies the S3 bucket where the objects will be uploaded.
+
+- **key:** The name of the object in the bucket, which corresponds to the filename.
+
+- **source:** The path to the local file that will be uploaded to the S3 bucket.
+
+- **etag:** 
+A unique identifier for the object, generated from the file's MD5 hash. This ensures that the object will be re-uploaded only if it has changed.
 
 **VPC ENDPOINT**
+
 VPC endpoints gives your VPC private, direct access to other AWS services like S3, so traffic doesn't need to go through the internet.
 
 Just like how internet gateways are like your VPC's door to the internet, you can think of VPC endpoints as private doors to specific AWS services.
 In this case we want to access our S3 bucket
+
 ```
 resource "aws_vpc_endpoint" "name" {
   vpc_id = aws_vpc.vpc.id
