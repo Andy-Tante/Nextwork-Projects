@@ -440,3 +440,219 @@ curl https://learn.nextwork.org/projects/aws-host-a-website-on-s3
 And it worked perfectly! 🎉
 
 This experience reinforced the importance of understanding how Security Groups and NACLs work together in AWS networking.
+
+------------------------------------------------------------------------------------
+**DAY 6: VPC PEERING**
+
+This Terraform configuration sets up a VPC peering connection where VPC2 (Accepter) is peered with another VPC (VPC1, REQUESTER). It provisions a subnet, an EC2 instance, a security group, an internet gateway, and necessary route tables for routing traffic between the peered VPCs.
+The terraform configuration below is for setting up a second VPC, remember we have a VPC we had created before and that will be our VPC 1.
+
+```
+resource "aws_vpc" "vpcpeer" {
+  cidr_block = var.vpc2
+  tags = {
+    Name = "NextWork 2"
+  }
+}
+resource "aws_subnet" "peersubnet" {
+  vpc_id                  = aws_vpc.vpcpeer.id
+  map_public_ip_on_launch = "true"
+  cidr_block              = var.peersubnet
+  availability_zone       = var.peerAZ
+  tags = {
+    Name = "Public 2"
+  }
+}
+resource "aws_security_group" "peersg" {
+  vpc_id      = aws_vpc.vpcpeer.id
+  description = "Accepter security group"
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol    = "tcp"
+  }
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol    = "tcp"
+  }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol    = "tcp"
+  }
+  ingress {
+    from_port   = "-1"
+    to_port     = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol    = "icmp"
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol    = "-1"
+  }
+  tags = {
+    Name = "Security group PEER"
+  }
+}
+resource "aws_instance" "name1" {
+  ami                         = "ami-02ccbe126fe6afe82"
+  instance_type               = "t2.micro"
+  vpc_security_group_ids      = [aws_security_group.peersg.id]
+  subnet_id                   = aws_subnet.peersubnet.id
+  associate_public_ip_address = true
+  tags = {
+    Name = "na"
+  }
+}
+resource "aws_internet_gateway" "peerigw" {
+  vpc_id = aws_vpc.vpcpeer.id
+}
+resource "aws_route_table" "peerroute" {
+  vpc_id = aws_vpc.vpcpeer.id
+  route {
+    gateway_id = aws_internet_gateway.peerigw.id
+    cidr_block = "0.0.0.0/0"
+  }
+}
+resource "aws_route_table_association" "name1" {
+  subnet_id      = aws_subnet.peersubnet.id
+  route_table_id = aws_route_table.peerroute.id
+}
+resource "aws_vpc_peering_connection" "peer" {
+  vpc_id      = aws_vpc.vpc.id #Requester VPC
+  peer_vpc_id = aws_vpc.vpcpeer.id #Accepter VPC
+  auto_accept = true #Automatically accepts peering request
+  tags = {
+    Name = "Nextwork VPC Peering"
+  }
+}
+#Route for VPC1 to reach VPC2 through peering
+resource "aws_route" "name" {
+  route_table_id            = aws_route_table.name.id
+  destination_cidr_block    = var.vpc2
+  vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
+}
+#Route for VPC2 to reach VPC1 through peering
+resource "aws_route" "name1" {
+  route_table_id            = aws_route_table.peerroute.id
+  destination_cidr_block    = var.cidr_block
+  vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
+}
+```
+--------------------------------------------------------------------------------
+**DAY 7: VPC Monitoring with Flow Logs**
+This section configures VPC Flow Logs to monitor traffic within the VPC. Flow Logs capture information about the IP traffic going to and from network interfaces in your VPC.
+
+**Key Components**
+
+**IAM Role for VPC Flow Logs:** Grants permissions to publish logs to CloudWatch.
+
+**IAM Policy Attachment:** Grants full access to CloudWatch Logs.
+
+**CloudWatch Log Group:** Stores the VPC Flow Logs.
+
+**VPC Flow Logs Configuration:** Enables monitoring for all traffic types.
+
+```
+resource "aws_iam_role" "flow_logs_role" {
+  name = "vpc-flow-logs-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "vpc-flow-logs.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+# Attach IAM Policy to Allow Logging to CloudWatch
+resource "aws_iam_policy_attachment" "flow_logs_policy" {
+  name       = "vpc-flow-logs-attachment"
+  roles      = [aws_iam_role.flow_logs_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+# Create a CloudWatch Log Group for Storing Flow Logs
+resource "aws_cloudwatch_log_group" "flow_logs_group" {
+  name              = "/aws/vpc-flow-logs"
+  retention_in_days = 30
+}
+# Enable VPC Flow Logs and Send Logs to CloudWatch
+resource "aws_flow_log" "vpc_flow_logs" {
+  log_destination      = aws_cloudwatch_log_group.flow_logs_group.arn
+  log_destination_type = "cloud-watch-logs"
+  traffic_type         = "ALL"
+  vpc_id               = aws_vpc.vpc.id
+  iam_role_arn         = aws_iam_role.flow_logs_role.arn
+}
+```
+**Generating and Viewing VPC Flow Logs**
+
+**Generating Logs by Pinging an Instance**
+
+**Launch an EC2 Instance:** Ensure an instance is running inside the monitored VPC. (we have instnaces form the previous porjects you can use)
+
+**Allow ICMP Traffic:** The security group attached to the instance must allow inbound ICMP traffic (ping requests).
+
+**Ping the Instance:** From another instance or your local machine, run:
+
+ping <EC2_PUBLIC_IP>
+
+This generates network traffic that will be logged in VPC Flow Logs.
+
+**Viewing Logs in CloudWatch**
+
+- Open AWS Console and navigate to CloudWatch.
+
+- Click on Log Groups in the left menu.
+
+- Find and select /aws/vpc-flow-logs.
+
+- Click on the latest log stream to view traffic data.
+
+- Logs will display information like source IP, destination IP, port, protocol, and whether the traffic was allowed or denied.
+
+**DAY 8 and 9: Access S3 from VPC and VPC Endpoints**
+We will create an S3 bucket, upload images from a specified directory to the bucket, and set up a VPC endpoint to enable secure access to the S3 bucket from within our Virtual Private Cloud (VPC).
+```
+resource "aws_s3_bucket" "name" {
+  bucket = "dobretechbucket"
+}
+```
+**resource "aws_s3_bucket" "name":** This block defines an S3 bucket resource.
+**bucket:** The name of the S3 bucket to be created. In this case, it’s named dobretechbucket. Ensure this name is unique across all S3 buckets in AWS.
+```
+resource "aws_s3_object" "name" {
+  for_each = fileset("images/", "*")
+  bucket   = aws_s3_bucket.name.id
+  key      = each.value
+  source   = "images/${each.value}"
+  etag     = filemd5("images/${each.value}")
+}
+```
+**resource "aws_s3_object" "name":** This block defines an S3 object resource.
+**for_each = fileset("images/", "*"):** This iterates over each file in the images/ directory, allowing you to upload multiple images at once.
+**bucket:** Specifies the S3 bucket where the objects will be uploaded.
+**key:** The name of the object in the bucket, which corresponds to the filename.
+**source:** The path to the local file that will be uploaded to the S3 bucket.
+**etag:** A unique identifier for the object, generated from the file's MD5 hash. This ensures that the object will be re-uploaded only if it has changed.
+
+**VPC ENDPOINT**
+VPC endpoints gives your VPC private, direct access to other AWS services like S3, so traffic doesn't need to go through the internet.
+
+Just like how internet gateways are like your VPC's door to the internet, you can think of VPC endpoints as private doors to specific AWS services.
+In this case we want to access our S3 bucket
+```
+resource "aws_vpc_endpoint" "name" {
+  vpc_id = aws_vpc.vpc.id
+  service_name = "com.amazonaws.eu-central-1.s3"
+}
+```

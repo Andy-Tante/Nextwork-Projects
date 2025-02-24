@@ -280,18 +280,20 @@ resource "aws_route_table_association" "name1" {
   route_table_id = aws_route_table.peerroute.id
 }
 resource "aws_vpc_peering_connection" "peer" {
-  vpc_id      = aws_vpc.vpc.id
-  peer_vpc_id = aws_vpc.vpcpeer.id
-  auto_accept = true
+  vpc_id      = aws_vpc.vpc.id #Requester VPC
+  peer_vpc_id = aws_vpc.vpcpeer.id #Accepter VPC
+  auto_accept = true #Automatically accepts peering request
   tags = {
     Name = "Nextwork VPC Peering"
   }
 }
+#Route for VPC1 to reach VPC2 through peering
 resource "aws_route" "name" {
   route_table_id            = aws_route_table.name.id
   destination_cidr_block    = var.vpc2
   vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
 }
+#Route for VPC2 to reach VPC1 through peering
 resource "aws_route" "name1" {
   route_table_id            = aws_route_table.peerroute.id
   destination_cidr_block    = var.cidr_block
