@@ -27,7 +27,7 @@ resource "aws_internet_gateway" "igw" {
 #DAY 2 (VPC TRAFFIC FLOW AND SECURITY)
 #Creating an instance
 resource "aws_instance" "name" {
-  ami                         = "ami-02ccbe126fe6afe82"
+  ami                         = "ami-02ccbe126fe6afe82" #replace with your own ami-id
   instance_type               = "t2.micro"
   subnet_id                   = aws_subnet.publicsubnet.id
   vpc_security_group_ids      = [aws_security_group.name.id]
@@ -65,12 +65,13 @@ resource "aws_security_group" "name" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   #Allows ICMP traffic (Can be Considered as DAY 5)
+  #Ignore this ICMP for now and come back to it on Day 5
   ingress {
-  from_port   = -1
-  to_port     = -1
-  protocol    = "icmp"
-  cidr_blocks = ["0.0.0.0/0"]
-}
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   #Allows INCOMING traffic from HTTPS
   ingress {
     from_port   = 443
@@ -83,7 +84,7 @@ resource "aws_security_group" "name" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] #replace with EC2 IP address
+    cidr_blocks = ["0.0.0.0/0"] #Normally in production you don't use this CIDR range as anyone could have access to it, it's best to have a CIDR range your instances fall under and can connect to it securely
   }
   #Allows OUTGOING traffic
   egress {
@@ -189,7 +190,7 @@ resource "aws_network_acl" "privatenacl" {
     Name = "Nextwork Private NACL"
   }
 }
-#DAY 4 Launch private subnet
+#DAY 4 Launch private subnet in an instance
 resource "aws_instance" "privateinstance" {
   ami                         = "ami-02ccbe126fe6afe82"
   instance_type               = "t2.micro"
@@ -209,56 +210,56 @@ resource "aws_vpc" "vpcpeer" {
   }
 }
 resource "aws_subnet" "peersubnet" {
-  vpc_id = aws_vpc.vpcpeer.id
+  vpc_id                  = aws_vpc.vpcpeer.id
   map_public_ip_on_launch = "true"
-  cidr_block = var.peersubnet
-  availability_zone = var.peerAZ
+  cidr_block              = var.peersubnet
+  availability_zone       = var.peerAZ
   tags = {
     Name = "Public 2"
   }
 }
 resource "aws_security_group" "peersg" {
-  vpc_id = aws_vpc.vpcpeer.id
+  vpc_id      = aws_vpc.vpcpeer.id
   description = "Accepter security group"
   ingress {
-    from_port = 22
-    to_port = 22
+    from_port   = 22
+    to_port     = 22
     cidr_blocks = ["0.0.0.0/0"]
-    protocol = "tcp"
+    protocol    = "tcp"
   }
   ingress {
-    from_port = 80
-    to_port = 80
+    from_port   = 80
+    to_port     = 80
     cidr_blocks = ["0.0.0.0/0"]
-    protocol = "tcp"
+    protocol    = "tcp"
   }
   ingress {
-    from_port = 443
-    to_port = 443
+    from_port   = 443
+    to_port     = 443
     cidr_blocks = ["0.0.0.0/0"]
-    protocol = "tcp"
+    protocol    = "tcp"
   }
   ingress {
-    from_port = "-1"
-    to_port = "-1"
+    from_port   = "-1"
+    to_port     = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-    protocol = "icmp"
+    protocol    = "icmp"
   }
   egress {
-    from_port = 0
-    to_port = 0
+    from_port   = 0
+    to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
-    protocol = "-1"
+    protocol    = "-1"
   }
   tags = {
     Name = "Security group PEER"
   }
 }
 resource "aws_instance" "name1" {
-  ami = "ami-02ccbe126fe6afe82"
-  instance_type = "t2.micro"
-  vpc_security_group_ids = [aws_security_group.peersg.id]
-  subnet_id = aws_subnet.peersubnet.id
+  ami                         = "ami-02ccbe126fe6afe82"
+  instance_type               = "t2.micro"
+  vpc_security_group_ids      = [aws_security_group.peersg.id]
+  subnet_id                   = aws_subnet.peersubnet.id
   associate_public_ip_address = true
   tags = {
     Name = "na"
@@ -275,25 +276,25 @@ resource "aws_route_table" "peerroute" {
   }
 }
 resource "aws_route_table_association" "name1" {
-  subnet_id = aws_subnet.peersubnet.id
+  subnet_id      = aws_subnet.peersubnet.id
   route_table_id = aws_route_table.peerroute.id
 }
 resource "aws_vpc_peering_connection" "peer" {
-  vpc_id = aws_vpc.vpc.id
+  vpc_id      = aws_vpc.vpc.id
   peer_vpc_id = aws_vpc.vpcpeer.id
-  auto_accept = true 
+  auto_accept = true
   tags = {
     Name = "Nextwork VPC Peering"
   }
 }
 resource "aws_route" "name" {
-  route_table_id = aws_route_table.name.id
-  destination_cidr_block = var.vpc2
+  route_table_id            = aws_route_table.name.id
+  destination_cidr_block    = var.vpc2
   vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
 }
 resource "aws_route" "name1" {
-  route_table_id = aws_route_table.peerroute.id
-  destination_cidr_block = var.cidr_block
+  route_table_id            = aws_route_table.peerroute.id
+  destination_cidr_block    = var.cidr_block
   vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
 }
 #Day 7 (VPC Monitoring with flowlogs)
@@ -320,14 +321,31 @@ resource "aws_iam_policy_attachment" "flow_logs_policy" {
 }
 # Create a CloudWatch Log Group for Storing Flow Logs
 resource "aws_cloudwatch_log_group" "flow_logs_group" {
-  name = "/aws/vpc-flow-logs"
+  name              = "/aws/vpc-flow-logs"
   retention_in_days = 30
 }
 # Enable VPC Flow Logs and Send Logs to CloudWatch
 resource "aws_flow_log" "vpc_flow_logs" {
   log_destination      = aws_cloudwatch_log_group.flow_logs_group.arn
   log_destination_type = "cloud-watch-logs"
-  traffic_type         = "ALL" 
-  vpc_id              = aws_vpc.vpc.id
-  iam_role_arn        = aws_iam_role.flow_logs_role.arn
+  traffic_type         = "ALL"
+  vpc_id               = aws_vpc.vpc.id
+  iam_role_arn         = aws_iam_role.flow_logs_role.arn
+}
+
+#DAY 8 and 9 (Access S3 from vpc and VPC Endpoints)
+resource "aws_s3_bucket" "name" {
+  bucket = "dobretechbucket"
+}
+resource "aws_s3_object" "name" {
+  for_each = fileset("images/", "*")
+  bucket   = aws_s3_bucket.name.id
+  key      = each.value
+  source   = "images/${each.value}"
+  etag     = filemd5("images/${each.value}")
+}
+#vpc endpoints
+resource "aws_vpc_endpoint" "name" {
+  vpc_id = aws_vpc.vpc.id
+  service_name = "com.amazonaws.eu-central-1.s3"
 }

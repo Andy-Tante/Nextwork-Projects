@@ -383,6 +383,20 @@ On Day 4, we focused on deploying an EC2 instance in the private subnet while tr
 
 - Ensured no public IP was assigned, keeping the instance private.
 
+```
+resource "aws_instance" "privateinstance" {
+  ami                         = "ami-02ccbe126fe6afe82"
+  instance_type               = "t2.micro"
+  subnet_id                   = aws_subnet.privatesubnet.id
+  vpc_security_group_ids      = [aws_security_group.name.id]
+  associate_public_ip_address = false
+  key_name                    = "terraform-key-pair"
+  tags = {
+    Name = "Nextwork Private Server"
+  }
+}
+```
+
 **Encountered SSH Access Issues:**
 
 - While trying to SSH into the private instance, authentication failed.
@@ -407,6 +421,15 @@ So, what was the problem? After troubleshooting, I realized that ICMP traffic (u
 **What is ICMP?**
 
 ICMP (Internet Control Message Protocol) is a network protocol used for diagnostics and error reporting, commonly used in ping and traceroute commands.
+
+```
+ingress {
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+```
 
 Since Security Groups manage instance-level traffic, I added the rule under #Day2 - Allows ICMP traffic (Considered as Day 5) in my Terraform configuration. Finally, as shown below, pinging the private instance was successful! ✅
 

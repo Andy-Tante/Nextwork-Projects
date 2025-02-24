@@ -16,14 +16,14 @@ variable "privatesubnet" {
 }
 #day6
 variable "vpc2" {
-  type = string
+  type    = string
   default = "10.2.0.0/16"
 }
 variable "peersubnet" {
-  type = string
+  type    = string
   default = "10.2.1.0/24"
 }
 variable "peerAZ" {
-  type = string
-default = "eu-central-1b"
+  type    = string
+  default = "eu-central-1b"
 }
