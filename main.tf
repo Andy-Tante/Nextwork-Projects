@@ -280,9 +280,9 @@ resource "aws_route_table_association" "name1" {
   route_table_id = aws_route_table.peerroute.id
 }
 resource "aws_vpc_peering_connection" "peer" {
-  vpc_id      = aws_vpc.vpc.id #Requester VPC
+  vpc_id      = aws_vpc.vpc.id     #Requester VPC
   peer_vpc_id = aws_vpc.vpcpeer.id #Accepter VPC
-  auto_accept = true #Automatically accepts peering request
+  auto_accept = true               #Automatically accepts peering request
   tags = {
     Name = "Nextwork VPC Peering"
   }
@@ -349,6 +349,6 @@ resource "aws_s3_object" "name" {
 #Day 9
 #vpc endpoints
 resource "aws_vpc_endpoint" "name" {
-  vpc_id = aws_vpc.vpc.id
+  vpc_id       = aws_vpc.vpc.id
   service_name = "com.amazonaws.eu-central-1.s3"
 }
